@@ -12,7 +12,7 @@ const bufferToStream = (buffer) => {
   return readable;
 };
 
-// Upload File to Cloudinary 
+// Upload File to Cloudinary
 export const uploadToCloudinary = async (file, folder) => {
   try {
     return new Promise((resolve, reject) => {
@@ -34,8 +34,14 @@ export const uploadToCloudinary = async (file, folder) => {
   }
 };
 
-//  Delete File from Cloudinary 
+//  Delete File from Cloudinary *
 export const deleteFromCloudinary = async (publicId) => {
+  if (!publicId || typeof publicId !== "string" || publicId.trim() === "") {
+    console.warn(
+      "Cloudinary delete skipped due to missing or invalid public_id"
+    );
+    return null;
+  }
   try {
     const result = await cloudinary.uploader.destroy(publicId);
     return result;

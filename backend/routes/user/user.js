@@ -4,20 +4,24 @@ import User from "../../models/users/users.js";
 import Post from "../../models/posts/posts.js";
 import Comment from "../../models/comments/comments.js";
 import { deleteFromCloudinary } from "../../utils/cloudinary.js";
-import {
-  verifyToken,
-} from "../../middleware/verifyToken.js";
+import { verifyToken } from "../../middleware/verifyToken.js";
 
 const router = express.Router();
 
-//  GET STATS (All users) 
+//  GET STATS (All users)
 router.get("/stats", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
 
     const totalPosts = await Post.countDocuments({ userId });
-    const resolvedPosts = await Post.countDocuments({ userId, status: "resolved" });
-    const unresolvedPosts = await Post.countDocuments({ userId, status: "unresolved" });
+    const resolvedPosts = await Post.countDocuments({
+      userId,
+      status: "resolved",
+    });
+    const unresolvedPosts = await Post.countDocuments({
+      userId,
+      status: "unresolved",
+    });
     const totalComments = await Comment.countDocuments({ userId });
 
     res.status(200).json({
@@ -32,7 +36,7 @@ router.get("/stats", verifyToken, async (req, res) => {
   }
 });
 
-// DELETE USER (Admin or Self) 
+// DELETE USER (Admin or Self)
 router.delete("/users/:id", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -95,8 +99,18 @@ router.delete("/users/:id", verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// Get User By ID*
+router.get("/users/:id", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
 
-
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 export default router;
-
