@@ -30,7 +30,7 @@ const NotificationPanel = ({ userId, onClose }) => {
   };
 
   return (
-    <div className="absolute right-0 mt-2 w-80 bg-white shadow-2xl rounded-lg border border-gray-100 z-30">
+    <div className="absolute right-0 mt-2 w-80 bg-white shadow-2xl cursor-pointer rounded-lg border border-gray-100 z-30">
       <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
         <h3 className="font-semibold text-gray-900 text-sm">Notifications</h3>
         <button

@@ -61,8 +61,27 @@ router.get("/:id/comment", async (req, res) => {
   try {
     const comments = await Comment.find({ postId: req.params.id }).sort({
       createdAt: -1,
+    }).lean(); // use lean() to make plain JS objects
+
+    // Get unique userIds from comments
+    const userIds = comments.map(c => c.userId.toString());
+
+     const users = await User.find({ _id: { $in: userIds } })
+      .select("_id verificationStatus") // only fetch what we need
+      .lean();
+
+    const userMap = {};
+    users.forEach(u => {
+      userMap[u._id.toString()] = u.verificationStatus || false;
     });
-    res.status(200).json(comments);
+
+    // Add verificationStatus to each comment
+    const commentsWithVerification = comments.map(c => ({
+      ...c,
+      verificationStatus: userMap[c.userId.toString()] || false
+    }));
+
+    res.status(200).json(commentsWithVerification);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

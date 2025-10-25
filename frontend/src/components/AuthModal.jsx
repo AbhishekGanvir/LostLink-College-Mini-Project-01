@@ -15,7 +15,7 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
   const [loading, setLoading] = useState(false);
 
   const commonInputClass =
-    "w-full rounded-md bg-gray-700 border border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
+    "w-full  rounded-md bg-gray-700 border border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -84,7 +84,7 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
                   className={commonInputClass}
                   onChange={(e) => setStudentname(e.target.value)}
                   value={Studentname}
-                  placeholder="Student Name"
+                  placeholder="John Doe"
                   disabled={loading}
                   required
                 />
@@ -98,21 +98,21 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
                   className={commonInputClass}
                   onChange={(e) => setPassword(e.target.value)}
                   value={password}
-                  placeholder="Password"
+                  placeholder="Pass@123"
                   disabled={loading}
                   required
                 />
               </div>
               <button
                 type="submit"
-                className={`w-full py-2 bg-blue-600 rounded-lg font-semibold transition-colors flex items-center justify-center ${
+                className={`w-full cursor-pointer py-2 bg-blue-600 rounded-lg font-semibold transition-colors flex items-center justify-center ${
                   loading
                     ? "opacity-60 cursor-not-allowed"
                     : "hover:bg-blue-700"
                 }`}
                 disabled={loading}
               >
-                {loading ? <Loader size={18} /> : "Login → 👆to see 👤"}
+                {loading ? <Loader size={18} /> : "Login"}
               </button>
             </form>
             <p className="text-center cursor-pointer text-sm text-gray-400 mt-6">
@@ -129,7 +129,7 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
         ) : (
           <div>
             <h2 className="text-3xl font-bold text-center">Sign Up</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit}  className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1">
                   Email
@@ -139,7 +139,7 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
                   className={commonInputClass}
                   onChange={(e) => setEmail(e.target.value)}
                   value={email}
-                  placeholder="Email Address"
+                  placeholder="Johndoe@gmail.com"
                   disabled={loading}
                   required
                 />
@@ -153,7 +153,7 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
                   className={commonInputClass}
                   onChange={(e) => setStudentname(e.target.value)}
                   value={Studentname}
-                  placeholder="Student Name"
+                  placeholder="John Doe"
                   disabled={loading}
                   required
                 />
@@ -170,34 +170,47 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
                   disabled={loading}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">
+             <div>
+                <label className="block text-sm cursor-pointer font-medium text-gray-400 mb-1">
                   College Year
                 </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Freshman, Sophomore"
+                <select
                   className={commonInputClass}
                   onChange={(e) => setCollege_year(e.target.value)}
                   value={college_year}
                   disabled={loading}
-                />
+                  required
+                >
+                  <option value="" disabled>Select year</option>
+                  <option value="1st yr">1st yr</option>
+                  <option value="2nd yr">2nd yr</option>
+                  <option value="3rd yr">3rd yr</option>
+                  <option value="4th yr">4th yr</option>
+                </select>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">
+                <label className="block cursor-pointer text-sm font-medium text-gray-400 mb-1">
                   Department
                 </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Computer Science"
+                <select
                   className={commonInputClass}
                   onChange={(e) => setDepartment(e.target.value)}
                   value={department}
                   disabled={loading}
-                />
+                  required
+                >
+                  <option value="" disabled>Select department</option>
+                  <option value="B.tech CSE">B.tech CSE</option>
+                  <option value="B.tech ENTC">B.tech ENTC</option>
+                  <option value="B.tech CE">B.tech CE</option>
+                  <option value="B.tech EE">B.tech EE </option>
+                  <option value="B.tech ME">B.tech ME</option>
+                </select>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">
+                <label className="block required:not-empty text-sm font-medium text-gray-400 mb-1">
                   Create Password
                 </label>
                 <input
@@ -222,7 +235,7 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
                 {loading ? (
                   <Loader size={18} />
                 ) : (
-                  "Create Account → 👆to see 👤"
+                  "Create Account"
                 )}
               </button>
             </form>

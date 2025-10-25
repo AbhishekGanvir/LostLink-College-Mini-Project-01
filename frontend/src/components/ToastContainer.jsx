@@ -11,7 +11,7 @@ export function ToastContainer() {
   const { toasts } = useToast();
 
   return (
-    <div className="fixed top-5 right-5 z-50 space-y-2 w-72">
+    <div className="fixed top-8 right-5 z-50 space-y-2 w-72">
       {toasts.map(({ id, type, message }) => (
         <div
           key={id}

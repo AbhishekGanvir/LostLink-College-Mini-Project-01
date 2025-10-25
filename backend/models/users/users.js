@@ -59,9 +59,8 @@ const UserSchema = new mongoose.Schema(
       default: false,
     },
     verificationStatus: {
-      type: String,
-      enum: ["unverified", "verified"],
-      default: "unverified",
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

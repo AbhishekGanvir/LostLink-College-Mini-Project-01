@@ -17,7 +17,7 @@ const upload = multer({ storage: multer.memoryStorage() }).fields([
 // ===== REGISTER (Normal or Admin) =====
 router.post("/register", upload, async (req, res) => {
   try {
-    const { email, studentname, password, college_year, department, isAdmin } = req.body;
+    const { email, studentname, password, college_year, department, isAdmin,verificationStatus } = req.body;
 
     if (!email || !studentname || !password) {
       return res.status(400).json({ message: "All required fields must be provided" });
@@ -52,7 +52,7 @@ router.post("/register", upload, async (req, res) => {
       college_year,
       department,
       isAdmin: isAdmin === "true",
-      verificationStatus: isAdmin === "true" ? "verified" : "unverified", // <-- ✅ If verified shows bluetick
+      verificationStatus: verificationStatus === "true", // <-- ✅ If verified shows bluetick
     });
 
     const savedUser = await newUser.save();

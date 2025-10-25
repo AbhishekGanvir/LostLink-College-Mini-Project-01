@@ -47,7 +47,7 @@ const PostSchema = new mongoose.Schema(
     },
     itemType: {
       type: String,
-      enum: ["lost", "found"],
+      enum: ["LOST", "FOUND"],
       required: true,
     },
     images: {
@@ -56,8 +56,8 @@ const PostSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["resolved", "unresolved"],
-      default: "unresolved",
+      enum: ["RESOLVED", "UNRESOLVED"],
+      default: "UNRESOLVED",
     },
     tags: {
       type: [String],

@@ -55,7 +55,7 @@ const Home = () => {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow flex flex-col lg:flex-row gap-8">
         {/* Sidebar */}
-        <aside className="w-full lg:w-1/4 space-y-6">
+        <aside className="w-full  lg:w-1/4 space-y-6">
           <Sidebar
             selectedFilter={filter}
             onFilterChange={setFilter}
@@ -65,13 +65,13 @@ const Home = () => {
         </aside>
 
         {/* Posts Section */}
-        <section className="flex-1 space-y-6">
+        <section className="flex-1 space-y-6 custom-scrollbar overflow-y-auto max-h-[80vh]">
           {filteredPosts.length === 0 ? (
             <div className="bg-white shadow-sm rounded-xl p-6 text-center text-gray-500">
               No items found matching your filters.
             </div>
           ) : (
-            filteredPosts.map((item) => <ItemCard key={item._id} item={item} />)
+            filteredPosts.map((item) => <ItemCard key={item._id} item={item}  />)
           )}
         </section>
 

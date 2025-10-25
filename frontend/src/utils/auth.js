@@ -32,7 +32,6 @@ export async function loginUser({ studentname, password }) {
     return { token, user };
   } catch (error) {
     console.error("Login Error:", error);
-    alert(error.message);
     throw error;
   }
 }
@@ -82,7 +81,7 @@ export async function registerUser({
     return { token, user };
   } catch (error) {
     console.error("Registration Error:", error);
-    alert(error.message);
+    
     throw error;
   }
 }

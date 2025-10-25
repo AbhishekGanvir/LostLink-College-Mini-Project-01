@@ -18,7 +18,7 @@ const RightPanel = () => {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
         <h3 className="font-bold text-gray-900 mb-3">About Us</h3>
         <img
@@ -33,19 +33,15 @@ const RightPanel = () => {
         </p>
       </div>
 
-      <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-        <h3 className="font-bold text-gray-900 mb-4">Community Stats</h3>
-        <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <p className="text-2xl font-bold text-blue-600">1,234</p>
-            <p className="text-xs text-gray-500">Items Found</p>
-          </div>
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <p className="text-2xl font-bold text-blue-600">{length}</p>
-            <p className="text-xs text-gray-500">Active Users</p>
-          </div>
+       <div className="bg-white p-5 rounded-xl shadow-sm">
+        <h3 className="font-bold text-lg mb-4">Community Stats</h3>
+        <div className="grid grid-cols-2 gap-4">
+            <div className="text-center bg-gray-100 p-4 rounded-lg"><p className="text-2xl font-bold text-blue-600">1,234</p><p className="text-xs text-gray-500">Items Found</p></div>
+            <div className="text-center bg-gray-100 p-4 rounded-lg"><p className="text-2xl font-bold text-blue-600">789</p><p className="text-xs text-gray-500">Active Users</p></div>
+            <div className="text-center bg-gray-100 p-4 rounded-lg"><p className="text-2xl font-bold text-blue-600">432</p><p className="text-xs text-gray-500">Success Stories</p></div>
+            <div className="text-center bg-gray-100 p-4 rounded-lg"><p className="text-2xl font-bold text-blue-600">56</p><p className="text-xs text-gray-500">Today's Posts</p></div>
         </div>
-      </div>
+    </div>
     </div>
   );
 };

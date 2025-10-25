@@ -14,11 +14,24 @@ router.get("/user/:id", verifyToken, async (req, res) => {
       .populate("commentId", "text")
       .populate("userId", "username");
 
-    res.status(200).json(notifications);
+    // Build dynamic messages
+    const notificationsWithMessage = notifications.map((n) => ({
+      _id: n._id,
+      user: n.userId?.username || "Someone",
+      post: n.postId?.title || "",
+      comment: n.commentId?.text || "",
+      createdAt: n.createdAt,
+      viewed: n.viewed,
+      // Build message dynamically
+      message: `${n.userId?.username || "Someone"} commented: "${n.commentId?.text || ""}" on your post: ${n.postId?.title || ""}`,
+    }));
+
+    res.status(200).json(notificationsWithMessage);
   } catch (err) {
     res.status(500).json({ message: "Error fetching notifications" });
   }
 });
+
 
 // ===== PUT /api/notifications/user/:id/viewed =====
 router.put("/user/:id/viewed", verifyToken, async (req, res) => {

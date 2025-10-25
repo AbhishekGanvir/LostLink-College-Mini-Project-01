@@ -1,18 +1,33 @@
-import React, { useState, useEffect } from "react";
-import { MessageSquare, UserStar, Edit, Trash2 } from "lucide-react";
+import React, { useState } from "react";
+import { MessageSquare, Edit, Trash2 } from "lucide-react";
 import CommentSection from "./CommentSection";
 import ImageSlider from "./ImageSlider";
 import EditPostModal from "./EditPostModal";
 import { deletePost } from "../utils/api";
 import toast from "react-hot-toast";
+import ConfirmDialog from "./ConfirmDialog";
 
-const ItemCard = ({ item, currentUser, onUpdate }) => {
+export const UnresolvedIcon = () => (
+  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block mr-1">
+    <circle cx="4" cy="4" r="4" fill="#F59E0B" />
+  </svg>
+);
+
+export const ResolvedIcon = () => (
+  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block mr-1">
+    <circle cx="4" cy="4" r="4" fill="#10B981" />
+  </svg>
+);
+
+const ItemCard = ({ item, currentUser, onUpdate, onDeleted }) => {
   const [showComments, setShowComments] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const safeItem = {
     studentname: "Anonymous",
-    status: "unresolved",
+    status: "UNRESOLVED",
     category: "General",
     itemType: "Item",
     title: "No Title Provided",
@@ -26,7 +41,6 @@ const ItemCard = ({ item, currentUser, onUpdate }) => {
     ...item,
   };
 
-  // normalize owner id (supports userId as object or string)
   const ownerId =
     safeItem.userId && typeof safeItem.userId === "object"
       ? safeItem.userId._id || safeItem.userId.id
@@ -37,120 +51,110 @@ const ItemCard = ({ item, currentUser, onUpdate }) => {
       ? safeItem.userId.profilePic?.url
       : safeItem.userProfilePic?.url;
 
-  const statusColor =
-    safeItem.status === "resolved" ? "text-green-500" : "text-amber-500";
-  const statusLabel =
-    safeItem.status === "resolved" ? "RESOLVED" : "UNRESOLVED";
 
-  const isUserAdmin =
-    (typeof safeItem.userId === "object" && safeItem.userId.isAdmin) ||
-    safeItem.isAdmin ||
-    false;
-
-  const isOwner =
-    !!currentUser &&
-    (currentUser._id === ownerId ||
-      currentUser.id === ownerId ||
-      currentUser._id === safeItem.userId);
+  const isResolved = safeItem.status?.toUpperCase() === "RESOLVED";
+  
+  const isLost = safeItem.itemType?.toUpperCase() === "FOUND";
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    setLoading(true);
     try {
       await deletePost(safeItem._id);
       toast.success("Post deleted successfully!");
-      onUpdate && onUpdate(); // Refresh parent list
+      setShowConfirm(false);
+      onDeleted && onDeleted(safeItem._id);
     } catch (err) {
-      toast.error("Failed to delete post.");
       console.error(err);
+      toast.error("Failed to delete post.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 overflow-hidden relative">
-        {/* Edit/Delete Buttons (Top Right) */}
-        {isOwner && (
-          <div className="absolute top-3 right-3 flex space-x-2">
-            <button
-              onClick={() => setShowEditModal(true)}
-              className="p-1.5 rounded-full hover:bg-blue-100 text-blue-600 transition"
-              title="Edit Post"
-            >
-              <Edit size={16} />
-            </button>
-            <button
-              onClick={handleDelete}
-              className="p-1.5 rounded-full hover:bg-red-100 text-red-600 transition"
-              title="Delete Post"
-            >
-              <Trash2 size={16} />
-            </button>
-          </div>
-        )}
+      <div className="bg-white p-6 rounded-xl relative shadow-sm">
+
+        {/* Edit/Delete Buttons */}
+        <div className="absolute top-3 right-3 flex space-x-2">
+          <button
+            onClick={() => setShowEditModal(true)}
+            className="p-1.5 rounded-full hover:bg-blue-100 text-blue-600 transition"
+            title="Edit Post"
+          >
+            <Edit size={16} />
+          </button>
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="p-1.5 rounded-full hover:bg-red-100 text-red-600 transition"
+            title="Delete Post"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
 
         {/* Header */}
         <div
           onClick={() => (window.location.href = "/profile/" + (ownerId || ""))}
-          className="flex items-start space-x-3 p-4 border-b border-gray-100 cursor-pointer"
+          className="flex items-start space-x-4 cursor-pointer"
         >
           <div className="flex-shrink-0">
             {profilePicUrl ? (
               <img
                 src={profilePicUrl}
                 alt={safeItem.studentname}
-                className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                className="w-10 h-10 rounded-full"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold">
+              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
                 {safeItem.studentname?.[0]?.toUpperCase() || "U"}
               </div>
             )}
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-900 truncate flex items-center space-x-2">
-              <span>{safeItem.studentname}</span>
-              {isUserAdmin && <UserStar size={16} className="text-blue-600" />}
+            <p className="font-semibold text-sm flex items-center space-x-1">
+              <span className="truncate">{safeItem.studentname}</span>
+              {safeItem.verificationStatus && (
+                <img
+                  src="../src/assets/verify.png"
+                  width={16}
+                  alt="verified"
+                  className="flex-shrink-0"
+                  title="Verified"
+                />
+              )}
             </p>
             <p className="text-xs text-gray-500">
-              {safeItem.college_year}{" "}
-              {safeItem.department && `• ${safeItem.department}`}
+              {safeItem.college_year} {safeItem.department && `• ${safeItem.department}`}
             </p>
-            <div className="text-xs mt-1 flex items-center space-x-2 font-semibold">
-              <span className={statusColor}>{statusLabel}</span>
-              <span className="text-gray-400">•</span>
-              <span className="text-blue-600 uppercase">
-                {safeItem.itemType}
+            <div className="text-xs text-gray-500 flex items-center space-x-2 mt-1">
+              <span className="flex items-center text-xs font-semibold">
+                {isResolved ? <ResolvedIcon /> : <UnresolvedIcon />}
+                {isResolved ? "RESOLVED" : "UNRESOLVED"}
               </span>
+              <span>•</span>
+              <span className="capitalize">{safeItem.category}</span>
               <span className="text-gray-400">•</span>
-              <span className="text-gray-500 capitalize">
-                {safeItem.category}
+              <span className={`font-semibold ${isLost ? "text-green-600" : "text-amber-600"}`}>
+                {safeItem.itemType}
               </span>
             </div>
           </div>
         </div>
 
         {/* Body */}
-        <div className="p-4">
-          <h2 className="text-lg font-bold text-gray-800 mb-2">
-            {safeItem.title}
-          </h2>
-          <p className="text-gray-600 text-sm leading-relaxed mb-3">
-            {safeItem.description}
-          </p>
-          {safeItem.images?.length > 0 && (
-            <ImageSlider images={safeItem.images} />
-          )}
+        <div className="mt-4">
+          <h2 className="text-lg font-bold">{safeItem.title}</h2>
+          <p className="text-gray-600 leading-relaxed mb-2 break-all whitespace-pre-wrap">{safeItem.description}</p>
+          {safeItem.images?.length > 0 && <ImageSlider images={safeItem.images} />}
         </div>
 
         {/* Tags */}
-        <div className="px-4 pb-2 flex flex-wrap gap-2">
+        <div className="px-4 mt-2 pb-2 flex flex-wrap gap-2">
           {safeItem.tags?.length > 0 ? (
             safeItem.tags.map((tag, i) => (
-              <span
-                key={i}
-                className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full font-medium"
-              >
+              <span key={i} className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full font-medium">
                 #{tag}
               </span>
             ))
@@ -196,6 +200,16 @@ const ItemCard = ({ item, currentUser, onUpdate }) => {
           onUpdate={onUpdate}
         />
       )}
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showConfirm}
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        onConfirm={handleDelete}
+        onCancel={() => setShowConfirm(false)}
+        loading={loading}
+      />
     </>
   );
 };

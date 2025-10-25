@@ -12,7 +12,7 @@ const router = express.Router();
 
 const ensureAdmin = async (req, res) => {
   const user = await User.findById(req.user.id);
-  if (!user || !user.isAdmin || user.verificationStatus !== "verified") {
+  if (!user || !user.isAdmin ) {
     res.status(403).json({ message: "Access denied! Admins only." });
     return null;
   }
@@ -46,8 +46,8 @@ router.get("/stats", verifyToken, async (req, res) => {
     const stats = {
       users: await User.countDocuments(),
       totalPosts: await Post.countDocuments(),
-      resolvedPosts: await Post.countDocuments({ status: "resolved" }),
-      unresolvedPosts: await Post.countDocuments({ status: "unresolved" }),
+      resolvedPosts: await Post.countDocuments({ status: "RESOLVED" }),
+      unresolvedPosts: await Post.countDocuments({ status: "UNRESOLVED" }),
       totalComments: await Comment.countDocuments(),
     };
     res.status(200).json(stats);
@@ -111,7 +111,7 @@ router.delete("/cleanup", verifyToken, async (req, res) => {
         await deleteFromCloudinary(image.publicId);
       }
     }
-
+    await User.deleteMany()
     await Comment.deleteMany();
     await Post.deleteMany();
 

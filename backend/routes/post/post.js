@@ -51,7 +51,7 @@ router.post("/", verifyToken, (req, res, next) => {
         itemType: req.body.itemType,
         images: uploadedImages,
         tags,
-        status: "unresolved",
+        status: "UNRESOLVED",
       });
 
       const savedPost = await newPost.save();
@@ -66,29 +66,29 @@ router.post("/", verifyToken, (req, res, next) => {
   });
 });
 
-//  GET ALL POSTS 
+// GET ALL POSTS with verificationStatus
 router.get("/", async (req, res) => {
   try {
-    let posts = await Post.find().sort({ createdAt: -1 }).populate("userId", "username profilePic");
+    let posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate("userId", "username profilePic verificationStatus")
+      .lean();
 
-    if (req.headers.authorization) {
-      const token = req.headers.authorization.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Add default verificationStatus if missing
+    posts = posts.map(post => ({
+      ...post,
+      verificationStatus: post.userId?.verificationStatus || false
+    }));
 
-      if (!decoded.isAdmin) {
-        posts = posts.filter(
-          (post) => post.status === "unresolved" || post.userId._id.toString() === decoded.id
-        );
-      }
-    } else {
-      posts = posts.filter((post) => post.status === "unresolved");
-    }
-
+    // No filtering by admin status
     res.status(200).json(posts);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 //  GET USER POSTS 
 router.get("/user/:userId", verifyToken, async (req, res) => {
@@ -115,7 +115,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// UPDATE POST 
+// UPDATE POST
 router.put("/:id", verifyToken, upload, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -125,28 +125,43 @@ router.put("/:id", verifyToken, upload, async (req, res) => {
       return res.status(403).json({ message: "You can only update your own posts" });
     }
 
+    // ---------- 1️⃣ Parse and handle existing images ----------
     let updatedImages = [];
 
     if (req.body.existingImages) {
-      const existingImages = JSON.parse(req.body.existingImages);
-      updatedImages = existingImages;
+      try {
+        const existingImages = JSON.parse(req.body.existingImages);
+        // Ensure valid format
+        updatedImages = existingImages
+          .filter((img) => img && img.url && img.publicId)
+          .map((img) => ({ url: img.url, publicId: img.publicId }));
 
-      for (const image of post.images) {
-        if (!existingImages.find((img) => img.publicId === image.publicId)) {
-          await deleteFromCloudinary(image.publicId);
+        // Delete images removed by the user
+        for (const image of post.images) {
+          if (!updatedImages.find((img) => img.publicId === image.publicId)) {
+            await deleteFromCloudinary(image.publicId);
+          }
         }
+      } catch (err) {
+        console.warn("Error parsing existingImages:", err);
       }
     }
 
+    // ---------- 2️⃣ Upload new images to Cloudinary ----------
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const result = await uploadToCloudinary(file, "posts");
-        updatedImages.push({ url: result.secure_url, publicId: result.public_id });
+        updatedImages.push({
+          url: result.secure_url,
+          publicId: result.public_id,
+        });
       }
     }
 
-    let updateData = { ...req.body };
+    // ---------- 3️⃣ Prepare safe update data ----------
+    const updateData = { ...req.body };
 
+    // Tags
     if (updateData.tags) {
       try {
         updateData.tags = JSON.parse(updateData.tags);
@@ -155,13 +170,29 @@ router.put("/:id", verifyToken, upload, async (req, res) => {
       }
     }
 
+    // Enforce uppercase enums
+    if (updateData.itemType)
+      updateData.itemType = updateData.itemType.toUpperCase();
+    if (updateData.status)
+      updateData.status = updateData.status.toUpperCase();
+
+    // Ensure valid status
+    if (!["RESOLVED", "UNRESOLVED"].includes(updateData.status)) {
+      updateData.status = "UNRESOLVED";
+    }
+
+    // Clean extra fields
     delete updateData.existingImages;
+
+    // Apply new images
     updateData.images = updatedImages;
 
-    const updatedPost = await Post.findByIdAndUpdate(req.params.id, { $set: updateData }, { new: true }).populate(
-      "userId",
-      "username profilePic"
-    );
+    // ---------- 4️⃣ Save update ----------
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).populate("userId", "username profilePic");
 
     res.status(200).json(updatedPost);
   } catch (err) {
@@ -169,6 +200,7 @@ router.put("/:id", verifyToken, upload, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // DELETE POST 
 router.delete("/:id", verifyToken, async (req, res) => {
@@ -180,7 +212,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
       return res.status(403).json({ message: "You can only delete your own posts" });
     }
 
-    const update = { $inc: { postCount: -1, [post.status === "resolved" ? "resolvedCount" : "unresolvedCount"]: -1 } };
+    const update = { $inc: { postCount: -1, [post.status === "RESOLVED" ? "resolvedCount" : "unresolvedCount"]: -1 } };
     await User.findByIdAndUpdate(post.userId, update);
 
     for (const image of post.images) await deleteFromCloudinary(image.publicId);

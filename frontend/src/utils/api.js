@@ -226,3 +226,18 @@ export async function getUserById(userId) {
     return null;
   }
 }
+
+
+
+
+export const updateUser = async (userId, formData) => {
+  const token = getCurrentUser()?.token;
+
+  const res = await apiClient.put(`/user/edit/${userId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};

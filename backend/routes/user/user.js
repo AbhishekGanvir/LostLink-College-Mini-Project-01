@@ -3,10 +3,12 @@ import bcrypt from "bcryptjs";
 import User from "../../models/users/users.js";
 import Post from "../../models/posts/posts.js";
 import Comment from "../../models/comments/comments.js";
-import { deleteFromCloudinary } from "../../utils/cloudinary.js";
+import upload from "../../middleware/uploadimages.js"
+import { deleteFromCloudinary,uploadToCloudinary } from "../../utils/cloudinary.js";
 import { verifyToken } from "../../middleware/verifyToken.js";
 
 const router = express.Router();
+
 
 //  GET STATS (All users)
 router.get("/stats", verifyToken, async (req, res) => {
@@ -16,11 +18,11 @@ router.get("/stats", verifyToken, async (req, res) => {
     const totalPosts = await Post.countDocuments({ userId });
     const resolvedPosts = await Post.countDocuments({
       userId,
-      status: "resolved",
+      status: "RESOLVED",
     });
     const unresolvedPosts = await Post.countDocuments({
       userId,
-      status: "unresolved",
+      status: "UNRESOLVED",
     });
     const totalComments = await Comment.countDocuments({ userId });
 
@@ -112,5 +114,59 @@ router.get("/users/:id", verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// UPDATE USER (Edit Profile)
+router.put(
+  "/edit/:id",
+  verifyToken,
+  upload.single("profilePic"), // same middleware as post/profile upload
+  async (req, res) => {
+    try {
+      const userId = req.params.id;
+
+      // Only allow self or admin
+      if (req.user.id !== userId && !req.user.isAdmin) {
+        return res.status(403).json({ message: "Unauthorized to update this user" });
+      }
+
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+
+      const { studentname, email, password, college_year, department } = req.body;
+
+      if (studentname) user.studentname = studentname;
+      if (email) user.email = email;
+      if (college_year) user.college_year = college_year;
+      if (department) user.department = department;
+
+      // Password update
+      if (password) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(password, salt);
+      }
+
+      // Profile picture update
+      if (req.file) {
+        // Delete old picture
+        if (user.profilePic?.publicId) {
+          await deleteFromCloudinary(user.profilePic.publicId);
+        }
+
+        // Upload new picture
+        const uploaded = await uploadToCloudinary(req.file, "profile-pics");
+        user.profilePic = {
+          url: uploaded.secure_url,
+          publicId: uploaded.public_id,
+        };
+      }
+
+      await user.save();
+      res.status(200).json({ message: "User updated successfully", user });
+    } catch (err) {
+      console.error("Error updating user:", err);
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
 
 export default router;

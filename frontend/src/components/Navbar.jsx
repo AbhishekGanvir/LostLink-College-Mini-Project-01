@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import bell from "../assets/bell.png";
 import AuthModal from "./AuthModal";
 import PostFormModal from "./PostFormModal";
 import NotificationPanel from "./NotificationDropdown";
 import { getCurrentUser, logout } from "../utils/auth";
 import { getNotifications } from "../utils/api";
+import { Bell } from "lucide-react";
 
 const Navbar = ({ onPostClick, searchQuery, setSearchQuery }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -71,22 +71,45 @@ const Navbar = ({ onPostClick, searchQuery, setSearchQuery }) => {
           />
         </div>
 
-        <div className="flex items-center gap-4 relative">
+        <div className="flex items-center cursor-pointer gap-4 relative">
           {/* Add Item Button */}
           {user && (
             <button
               onClick={onPostClick}
-              className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-sm"
+              className="flex items-center cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-sm"
             >
-              + Add Item
+              Add Post
             </button>
+          )}
+
+          {/* Notifications Button */}
+          {user && (
+            <div className="relative">
+              <button
+                title="Notifications"
+                onClick={() => setShowNotifications((p) => !p)}
+                className="relative focus:outline-none"
+              >
+                <Bell alt="Notifications" className="h-6 cursor-pointer w-6" />
+                {notifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3 animate-pulse" />
+                )}
+              </button>
+
+              {showNotifications && (
+                <NotificationPanel
+                  userId={user?._id}
+                  onClose={() => setShowNotifications(false)}
+                />
+              )}
+            </div>
           )}
 
           {/* Authentication */}
           {!user ? (
             <button
               onClick={() => setShowAuthModal(true)}
-              className="border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-100 font-medium"
+              className="border cursor-pointer border-gray-200 px-4 py-2 rounded-lg bg-blue-600 text-white  font-medium"
             >
               Login
             </button>
@@ -103,21 +126,22 @@ const Navbar = ({ onPostClick, searchQuery, setSearchQuery }) => {
                     className="w-9 h-9 rounded-full border-2 border-transparent hover:border-blue-500"
                   />
                 ) : (
-                  <div className="w-9 h-9 flex items-center justify-center bg-gray-200 rounded-full text-gray-600 font-bold">
+                  <div className="w-9 h-9 flex items-center justify-center cursor-pointer bg-gray-200 rounded-full text-gray-600 font-bold">
                     {user.studentname?.[0]?.toUpperCase() || "U"}
                   </div>
                 )}
               </button>
 
               {showUserDropdown && (
-                <div className="absolute top-12 right-0 w-48 bg-white rounded-lg shadow-2xl z-20 border border-gray-100 overflow-hidden">
+                <div className="absolute top-12  right-0 w-48 bg-white rounded-lg shadow-2xl z-20 border p-2 py-1 border-gray-100 overflow-hidden">
+
                   <button
                     onClick={() => {
                       setShowUserDropdown(false);
                       window.location.href = "/profile/" + user._id;
                     }}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                  >
+                    className="w-full cursor-pointer text-left flex items-center p-2 hover:bg-gray-100 rounded-md"
+                  ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user mr-2" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     Profile
                   </button>
 
@@ -127,16 +151,16 @@ const Navbar = ({ onPostClick, searchQuery, setSearchQuery }) => {
                         handleGoToAdmin();
                         setShowUserDropdown(false);
                       }}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
+                      className="w-full cursor-pointer text-left flex items-center p-2 hover:bg-gray-100 rounded-md"
+                    ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users mr-2" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
                       Admin Panel
                     </button>
                   )}
 
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
-                  >
+                    className="w-full cursor-pointer text-left flex items-center p-2 text-red-600 hover:bg-red-50 rounded-md">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out mr-2" aria-hidden="true"><path d="m16 17 5-5-5-5"></path><path d="M21 12H9"></path><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path></svg>
                     Logout
                   </button>
                 </div>
@@ -144,34 +168,13 @@ const Navbar = ({ onPostClick, searchQuery, setSearchQuery }) => {
             </div>
           )}
 
-          {/* Notifications Button */}
-          {user && (
-            <div className="relative">
-              <button
-                title="Notifications"
-                onClick={() => setShowNotifications((p) => !p)}
-                className="relative focus:outline-none"
-              >
-                <img src={bell} alt="Notifications" className="h-5 w-5" />
-                {notifications.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3 animate-pulse" />
-                )}
-              </button>
-
-              {showNotifications && (
-                <NotificationPanel
-                  userId={user?._id}
-                  onClose={() => setShowNotifications(false)}
-                />
-              )}
-            </div>
-          )}
+          
         </div>
       </div>
 
       {/* Auth Modals */}
       {showAuthModal && (
-        <AuthModal
+        <AuthModal 
           onClose={() => setShowAuthModal(false)}
           onLoginSuccess={handleLoginSuccess}
         />

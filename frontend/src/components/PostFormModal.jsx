@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { createPost } from "../utils/api";
 import { getCurrentUser } from "../utils/auth";
 import toast from "react-hot-toast";
+import {X} from "lucide-react"
 
 const PostFormModal = ({ closeModal }) => {
   const [form, setForm] = useState({
     title: "",
     description: "",
     category: "personal item", // matches backend enum
-    itemType: "lost", // matches backend enum
+    itemType: "LOST", // matches backend enum
     tags: "",
     images: [],
   });
@@ -75,7 +76,7 @@ const PostFormModal = ({ closeModal }) => {
         title: "",
         description: "",
         category: "personal item",
-        itemType: "lost",
+        itemType: "LOST",
         tags: "",
         images: [],
       });
@@ -89,43 +90,37 @@ const PostFormModal = ({ closeModal }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-30 p-4">
-      <div className="bg-white w-full max-w-md sm:w-96 rounded-xl shadow-lg p-6 relative animate-slideUp">
+    <div className="fixed inset-0 bg-black/40 bg-opacity-70 flex items-center justify-center  z-50">
+      <div className="bg-gray-800 text-white p-8 rounded-xl shadow-2xl w-full max-w-lg relative">
         <button
           onClick={closeModal}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 transition"
+          className="absolute top-4 right-4 text-gray-400 cursor-pointer hover:text-white"
         >
-          ✕
+          <X size={24} />
         </button>
 
-        <h2 className="text-xl font-semibold text-gray-900 text-center mb-4">
-          Create New Post
+        <h2 className="text-3xl font-bold mb-6  text-center">
+          Create  Post
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
           {/* Title */}
           <div className="relative">
+            <label className="block text-sm font-medium text-gray-400 mb-1">Post Title</label>
             <input
               type="text"
               id="title"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="peer w-full border border-gray-300 rounded-md p-3 placeholder-transparent focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
               placeholder=" "
               required
             />
-            <label
-              htmlFor="title"
-              className="absolute left-3 top-3 text-gray-500 text-sm transition-all 
-                peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base 
-                peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600"
-            >
-              Item Title *
-            </label>
           </div>
 
           {/* Description */}
           <div className="relative">
+            <label className="block text-sm font-medium text-gray-400 mb-1">Details</label>
             <textarea
               id="description"
               rows={3}
@@ -133,63 +128,56 @@ const PostFormModal = ({ closeModal }) => {
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
-              className="peer w-full border border-gray-300 rounded-md p-3 placeholder-transparent focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
               placeholder=" "
               required
             ></textarea>
-            <label
-              htmlFor="description"
-              className="absolute left-3 top-3 text-gray-500 text-sm transition-all 
-                peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base 
-                peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600"
-            >
-              Description *
-            </label>
+            
           </div>
 
           {/* Category */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Category</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Category</label>
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full border border-gray-300 rounded-md p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
             >
-              <option value="personal item">Personal Item</option>
-              <option value="document">Document</option>
+              <option value="Personal Item">Personal Item</option>
+              <option value="Document">Document</option>
             </select>
           </div>
 
           {/* Item Type */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1">
+            <label className="block text-sm font-medium text-gray-400 mb-1">
               Item Type
             </label>
             <select
               value={form.itemType}
               onChange={(e) => setForm({ ...form, itemType: e.target.value })}
-              className="w-full border border-gray-300 rounded-md p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
             >
-              <option value="lost">Lost</option>
-              <option value="found">Found</option>
+              <option value="LOST">Lost</option>
+              <option value="FOUND">Found</option>
             </select>
           </div>
 
           {/* Tags */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Tags</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Tags</label>
             <input
               type="text"
               value={form.tags}
               onChange={(e) => setForm({ ...form, tags: e.target.value })}
               className="w-full border border-gray-300 rounded-md p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
-              placeholder="e.g. purse, pink, ID card"
+              placeholder="e.g. Phone, ID card"
             />
           </div>
 
           {/* Image Upload */}
           <div>
-            <label className="block text-sm text-gray-600 mb-2">
+            <label className="block text-sm font-medium text-gray-400 mb-1">
               Upload Images (max 3)
             </label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition">
@@ -205,7 +193,7 @@ const PostFormModal = ({ closeModal }) => {
                 htmlFor="fileUpload"
                 className="cursor-pointer text-blue-600 font-medium"
               >
-                Click to upload
+                Click to add images
               </label>
               <p className="text-xs text-gray-500 mt-1">
                 (PNG, JPG up to 5MB each)
@@ -227,7 +215,7 @@ const PostFormModal = ({ closeModal }) => {
                     <button
                       type="button"
                       onClick={() => removeImage(i)}
-                      className="absolute top-1 right-1 bg-black/60 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                      className="absolute top-1 right-1 bg-black/60 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 cursor-pointer group-hover:opacity-100 transition"
                     >
                       ✕
                     </button>
@@ -242,20 +230,20 @@ const PostFormModal = ({ closeModal }) => {
             <button
               type="button"
               onClick={closeModal}
-              className="w-full sm:w-auto px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+              className="w-full sm:w-auto px-4 py-2 rounded-md border border-gray-300 cursor-pointer text-gray-400 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`w-full sm:w-auto px-5 py-2 rounded-md text-white font-medium transition ${
+              className={`w-full sm:w-auto px-5 py-2 rounded-md text-white font-medium cursor-pointer transition ${
                 loading
                   ? "bg-blue-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
-              {loading ? "Posting..." : "Post Item"}
+              {loading ? "Posting..." : "Add Post"}
             </button>
           </div>
         </form>
