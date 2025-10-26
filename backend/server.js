@@ -16,6 +16,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use(cors({
+  origin: ["https://lostlink-oi9s.onrender.com"],
+  credentials: true,
+}));
+
+
 // --- API ROUTES ---
 import authRoutes from "./routes/auth/auth.js";
 import adminRoutes from "./routes/admin/admin.js";
@@ -57,6 +63,7 @@ if (process.env.NODE_ENV === "production") {
 
 // --- Start Server ---
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
+
