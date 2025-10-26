@@ -71,7 +71,7 @@ const EditPostModal = ({ post, closeModal, onUpdate }) => {
       });
 
       await updatePost(post._id, formData);
-      toast.success("✅ Post updated successfully!");
+      toast.success("Post updated successfully!");
       onUpdate && onUpdate();
       closeModal();
     } catch (err) {

@@ -136,7 +136,7 @@ const canDelete = isOwner || isAdmin; // owner or admin can delete
               <span className="truncate">{safeItem.studentname}</span>
               {safeItem.verificationStatus && (
                 <img
-                  src="../src/assets/verify.png"
+                  src="../verify.png"
                   width={16}
                   alt="verified"
                   className="flex-shrink-0"
@@ -168,7 +168,7 @@ const canDelete = isOwner || isAdmin; // owner or admin can delete
 
         {/* Body */}
         <div className="mt-4">
-          <h2 className="text-lg font-bold">{safeItem.title}</h2>
+          <h2 className="text-lg font-bold leading-relaxed break-all whitespace-pre-wrap">{safeItem.title}</h2>
           <p className="text-gray-600 leading-relaxed mb-2 break-all whitespace-pre-wrap">{safeItem.description}</p>
           {safeItem.images?.length > 0 && <ImageSlider images={safeItem.images} />}
         </div>

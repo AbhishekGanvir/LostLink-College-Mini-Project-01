@@ -126,7 +126,6 @@ const CommentSection = ({ postId }) => {
 
           return (
             <div
-            onClick={() => window.location.href = `/profile/${user._id}`}
               key={c._id}
               className="flex cursor-pointer items-start space-x-3 bg-gray-50 p-3 rounded-lg break-words"
             >
@@ -150,7 +149,7 @@ const CommentSection = ({ postId }) => {
 
                     {/* Verified badge only for admins and evryone can see them verify by user  */}
                       { c.verificationStatus&& (
-                        <img src="../src/assets/verify.png" width={16} alt="verified" className="  flex-shrink-0" title="Verified" />
+                        <img src="../verify.png" width={16} alt="verified" className="  flex-shrink-0" title="Verified" />
                          
                        )}
 

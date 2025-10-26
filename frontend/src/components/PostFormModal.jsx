@@ -70,7 +70,7 @@ const PostFormModal = ({ closeModal }) => {
       form.images.forEach((img) => formData.append("images", img.file));
 
       await createPost(formData);
-      toast.success("✅ Post created successfully!");
+      toast.success(" Post created successfully!");
 
       setForm({
         title: "",

@@ -86,10 +86,14 @@ Admins have additional privileges to manage users, posts, and maintain a safe en
 
 ### 👤 User Routes
 
-| Method     | Endpoint              | Description           |
-| ---------- | --------------------- | --------------------- |
-| **GET**    | `/api/user/stats`     | Get user statistics   |
-| **DELETE** | `/api/user/users/:id` | Delete a user profile |
+| Method     | Endpoint              | Description                    |
+| ---------- | --------------------- | ------------------------------ |
+| **GET**    | `/api/user/stats`     | Get user statistics            |
+| **GET**    | `/api/user/users/:id` | Get details of a specific user |
+| **PUT**    | `/api/user/edit/:id`  | Update a user profile          |
+| **DELETE** | `/api/user/users/:id` | Delete a user profile          |
+
+> 🔹Added GET `/user/users/:id` and PUT `/user/edit/:id` to support user details fetching and profile update.
 
 ---
 
@@ -113,6 +117,14 @@ Admins have additional privileges to manage users, posts, and maintain a safe en
 | **PUT**    | `/api/post/:id`      | Update an existing post and images                   |
 | **DELETE** | `/api/post/:id`      | Delete post and cleanup images/comments              |
 
+> 🔹 Admin-specific post routes:
+> | Method     | Endpoint             | Description                  |
+> | ---------- | -------------------- | ---------------------------- |
+> | **GET**    | `/api/admin/posts`   | Get all posts (admin view)   |
+> | **DELETE** | `/api/admin/posts/:id` | Delete any post (admin)    |
+> | **DELETE** | `/api/admin/cleanup` | Admin cleanup tasks          |
+
+
 ---
 
 ### 💬 Comment Routes
@@ -122,16 +134,6 @@ Admins have additional privileges to manage users, posts, and maintain a safe en
 | **POST**   | `/api/post/:id/comment`            | Add a comment to a post     |
 | **GET**    | `/api/post/:id/comment`            | Get all comments for a post |
 | **DELETE** | `/api/post/:id/comment/:commentId` | Delete a specific comment   |
-
----
-
-### 🧠 Admin Routes
-
-| Method     | Endpoint               | Description                                    |
-| ---------- | ---------------------- | ---------------------------------------------- |
-| **GET**    | `/api/admin/stats`     | Get platform statistics                        |
-| **GET**    | `/api/admin/users`     | View all users                                 |
-| **DELETE** | `/api/admin/users/:id` | Delete user, posts, comments, and related data |
 
 ---
 
@@ -145,6 +147,22 @@ Admins have additional privileges to manage users, posts, and maintain a safe en
 | **DELETE** | `/api/notification/:id`             | Delete a specific notification       |
 
 ---
+
+
+### 🧠 Admin Routes
+
+| Method     | Endpoint               | Description                                    |
+| ---------- | ---------------------- | ---------------------------------------------- |
+| **GET**    | `/api/admin/stats`     | Get platform statistics                        |
+| **GET**    | `/api/admin/users`     | View all users                                 |
+| **DELETE** | `/api/admin/users/:id` | Delete user, posts, comments, and related data |
+| **GET**    | `/api/admin/posts`     | Get all posts (admin view)                     |
+| **DELETE** | `/api/admin/posts/:id` | Delete any post                                |
+| **DELETE** | `/api/admin/cleanup`   | Run admin cleanup tasks                        |
+
+---
+
+
 
 ## 🧾 Notes for Postman Testing
 
@@ -162,8 +180,7 @@ Admins have additional privileges to manage users, posts, and maintain a safe en
 
   ```json
   {
-    "isAdmin": true,
-    "verifyStatus": "verified"
+    "isAdmin": true
   }
   ```
 #   

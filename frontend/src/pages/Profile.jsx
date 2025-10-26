@@ -116,12 +116,11 @@ const Profile = () => {
             )}
           </div>
            <div>
-          <h2 className="text-4xl font-bold text-white  capitalize flex items-center space-x-1">
-             <span className="truncate capitalize">{viewedUser.studentname}</span>
+          <h2 className="text-4xl font-bold text-white   flex items-center space-x-1">
+             <span className="truncate capitalize leading-relaxed break-all whitespace-pre-wrap">{viewedUser.studentname}</span>
              { viewedUser.verificationStatus&& (
-           <img src="../src/assets/verify.png" width={28} alt="verified" className="  flex-shrink-0 mt-2.5 ml-1.5" title="Verified" />
-                         
-                       )}
+           <img src="../verify.png" width={28} alt="verified" className="  flex-shrink-0 mt-2.5 ml-1.5" title="Verified" />
+          )}
           </h2>
 
           <p className="text-[#E5E7EB] mt-1 text-sm">
