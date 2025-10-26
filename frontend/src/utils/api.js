@@ -46,6 +46,7 @@ export async function getUserPosts(userId) {
   }
 }
 
+
 export async function createPost(formData) {
   try {
     const res = await apiClient.post("/post", formData, {
@@ -193,6 +194,38 @@ export async function adminDeleteUser(userId) {
   }
 }
 
+export async function getAdminPosts() {
+  try {
+    const res = await apiClient.get("/admin/posts");
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching admin posts:", err);
+    return [];
+  }
+}
+
+export async function adminDeletePost(postId) {
+  try {
+    const res = await apiClient.delete(`/admin/posts/${postId}`);
+    return res.data;
+  } catch (err) {
+    console.error("Error deleting post:", err);
+    throw err;
+  }
+}
+
+// --- Admin Cleanup ---
+export async function adminCleanup() {
+  try {
+    const res = await apiClient.delete("/admin/cleanup");
+    return res.data;
+  } catch (err) {
+    console.error("Cleanup failed:", err);
+    throw err;
+  }
+}
+
+
 export async function loginUser(studentname, password) {
   try {
     const res = await apiClient.post("/auth/login", { studentname, password });
@@ -217,9 +250,16 @@ export async function getAllUsers() {
   }
 }
 
+
 export async function getUserById(userId) {
   try {
-    const res = await apiClient.get(`/user/users/${userId}`);
+    const token = localStorage.getItem("ll_token"); // ✅ match interceptor
+
+    const headers = token
+      ? { Authorization: `Bearer ${token}` }
+      : {};
+
+    const res = await apiClient.get(`/user/users/${userId}`, { headers });
     return res.data;
   } catch (err) {
     console.error("Error fetching user:", err);
@@ -227,6 +267,18 @@ export async function getUserById(userId) {
   }
 }
 
+export async function getUserStats() {
+  try {
+    const token = localStorage.getItem("ll_token");
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    const res = await apiClient.get(`/user/stats`, { headers });
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching user stats:", err);
+    return null;
+  }
+}
 
 
 

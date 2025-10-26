@@ -39,12 +39,11 @@ const ItemCard = ({ item, currentUser, onUpdate, onDeleted }) => {
     commentCount: 0,
     views: 0,
     ...item,
+    verificationStatus: item.userId?.verificationStatus, // ← add this
+    isAdmin: item.userId?.isAdmin
   };
 
-  const ownerId =
-    safeItem.userId && typeof safeItem.userId === "object"
-      ? safeItem.userId._id || safeItem.userId.id
-      : safeItem.userId;
+   
 
   const profilePicUrl =
     typeof safeItem.userId === "object"
@@ -55,6 +54,19 @@ const ItemCard = ({ item, currentUser, onUpdate, onDeleted }) => {
   const isResolved = safeItem.status?.toUpperCase() === "RESOLVED";
   
   const isLost = safeItem.itemType?.toUpperCase() === "FOUND";
+
+    const ownerId = safeItem.userId?._id?.toString() || safeItem.userId?.toString();
+const currentUserId = currentUser?._id?.toString();
+const isOwner = currentUserId && ownerId && currentUserId === ownerId;
+
+const isAdmin = currentUser?.isAdmin;
+const canEdit = isOwner;          // owner can edit
+const canDelete = isOwner || isAdmin; // owner or admin can delete
+
+
+
+
+
 
   const handleDelete = async () => {
     setLoading(true);
@@ -74,24 +86,31 @@ const ItemCard = ({ item, currentUser, onUpdate, onDeleted }) => {
   return (
     <>
       <div className="bg-white p-6 rounded-xl relative shadow-sm">
+                  {/* Edit and delete */}
+                {(canEdit || canDelete) && (
+            <div className="absolute top-3 right-3 flex space-x-2">
+              {canEdit && (
+                <button
+                  onClick={() => setShowEditModal(true)}
+                  className="p-1.5 cursor-pointer rounded-full hover:bg-blue-100 text-blue-600 transition"
+                  title="Edit Post"
+                >
+                  <Edit size={16} />
+                </button>
+              )}
+              {canDelete && (
+                <button
+                  onClick={() => setShowConfirm(true)}
+                  className="p-1.5 cursor-pointer rounded-full hover:bg-red-100 text-red-600 transition"
+                  title="Delete Post"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+            </div>
+          )}
 
-        {/* Edit/Delete Buttons */}
-        <div className="absolute top-3 right-3 flex space-x-2">
-          <button
-            onClick={() => setShowEditModal(true)}
-            className="p-1.5 rounded-full hover:bg-blue-100 text-blue-600 transition"
-            title="Edit Post"
-          >
-            <Edit size={16} />
-          </button>
-          <button
-            onClick={() => setShowConfirm(true)}
-            className="p-1.5 rounded-full hover:bg-red-100 text-red-600 transition"
-            title="Delete Post"
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+
 
         {/* Header */}
         <div
@@ -126,6 +145,10 @@ const ItemCard = ({ item, currentUser, onUpdate, onDeleted }) => {
               )}
             </p>
             <p className="text-xs text-gray-500">
+              {safeItem.isAdmin && (
+    <span className="font-semibold text-blue-600 mr-1">Admin •</span>
+  )}
+
               {safeItem.college_year} {safeItem.department && `• ${safeItem.department}`}
             </p>
             <div className="text-xs text-gray-500 flex items-center space-x-2 mt-1">
@@ -134,8 +157,8 @@ const ItemCard = ({ item, currentUser, onUpdate, onDeleted }) => {
                 {isResolved ? "RESOLVED" : "UNRESOLVED"}
               </span>
               <span>•</span>
-              <span className="capitalize">{safeItem.category}</span>
-              <span className="text-gray-400">•</span>
+              <span className="capitalize ">{safeItem.category}</span>
+              <span className="text-gray-500">•</span>
               <span className={`font-semibold ${isLost ? "text-green-600" : "text-amber-600"}`}>
                 {safeItem.itemType}
               </span>
@@ -168,7 +191,7 @@ const ItemCard = ({ item, currentUser, onUpdate, onDeleted }) => {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setShowComments((prev) => !prev)}
-              className="flex items-center space-x-1 hover:text-gray-900 transition"
+              className="flex items-center cursor-pointer space-x-1 hover:text-gray-900 transition"
               aria-label="Toggle comments"
             >
               <MessageSquare size={14} />
@@ -186,7 +209,7 @@ const ItemCard = ({ item, currentUser, onUpdate, onDeleted }) => {
         </div>
 
         {showComments && (
-          <div className="border-t border-gray-100 bg-gray-50 p-4">
+          <div className="border-t border-gray-100  bg-gray-50 p-4">
             <CommentSection postId={safeItem._id} currentUser={currentUser} />
           </div>
         )}

@@ -10,20 +10,51 @@ import { verifyToken } from "../../middleware/verifyToken.js";
 const router = express.Router();
 
 
-//  GET STATS (All users)
-router.get("/stats", verifyToken, async (req, res) => {
-  try {
-    const userId = req.user.id;
+/**
+ * Optional authentication middleware:
+ * Tries to verify token if present, but doesn’t block request if not.
+ */
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.split(" ")[1];
+    try {
+      const user = verifyToken(token); // You may need to slightly adjust verifyToken to return decoded data instead of sending res
+      req.user = user;
+    } catch (err) {
+      // Ignore invalid token; continue as unauthenticated
+      console.warn("Invalid token (optionalAuth):", err.message);
+    }
+  }
+  next();
+};
+
+
+// 🧾 GET USER STATS (Public + Auth)
+router.get("/stats", optionalAuth, async (req, res) => {
+  try {
+    let userId = req.user?.id;
+
+    // If no authenticated user, return general stats (for all users)
+    if (!userId) {
+      const totalPosts = await Post.countDocuments();
+      const resolvedPosts = await Post.countDocuments({ status: "RESOLVED" });
+      const unresolvedPosts = await Post.countDocuments({ status: "UNRESOLVED" });
+      const totalComments = await Comment.countDocuments();
+
+      return res.status(200).json({
+        totalPosts,
+        resolvedPosts,
+        unresolvedPosts,
+        totalComments,
+      });
+    }
+
+    // If authenticated, return personal stats
     const totalPosts = await Post.countDocuments({ userId });
-    const resolvedPosts = await Post.countDocuments({
-      userId,
-      status: "RESOLVED",
-    });
-    const unresolvedPosts = await Post.countDocuments({
-      userId,
-      status: "UNRESOLVED",
-    });
+    const resolvedPosts = await Post.countDocuments({ userId, status: "RESOLVED" });
+    const unresolvedPosts = await Post.countDocuments({ userId, status: "UNRESOLVED" });
     const totalComments = await Comment.countDocuments({ userId });
 
     res.status(200).json({
@@ -37,6 +68,24 @@ router.get("/stats", verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+// 👤 GET USER BY ID (Public + Auth)
+router.get("/users/:id", optionalAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password"); // don’t return sensitive info
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.error("Get user by ID error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // DELETE USER (Admin or Self)
 router.delete("/users/:id", verifyToken, async (req, res) => {
@@ -98,19 +147,6 @@ router.delete("/users/:id", verifyToken, async (req, res) => {
     });
   } catch (err) {
     console.error("Error deleting user:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-// Get User By ID*
-router.get("/users/:id", verifyToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json(user);
-  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

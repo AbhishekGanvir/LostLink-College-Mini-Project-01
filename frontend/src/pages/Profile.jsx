@@ -95,7 +95,9 @@ const Profile = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar
+  onPostClick={() => setShowPostModal(true)}
+/>
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
         {/* ==== User Info Header ==== */}
         <div className="bg-gradient-to-r from-indigo-700 to-purple-500
@@ -114,15 +116,18 @@ const Profile = () => {
             )}
           </div>
            <div>
-          <h2 className="text-4xl font-bold text-gray-800  flex items-center space-x-1">
-             <span className="truncate">{viewedUser.studentname?.toUpperCase()}</span>
+          <h2 className="text-4xl font-bold text-white  capitalize flex items-center space-x-1">
+             <span className="truncate capitalize">{viewedUser.studentname}</span>
              { viewedUser.verificationStatus&& (
-           <img src="../src/assets/verify.png" width={28} alt="verified" className="  flex-shrink-0" title="Verified" />
+           <img src="../src/assets/verify.png" width={28} alt="verified" className="  flex-shrink-0 mt-2.5 ml-1.5" title="Verified" />
                          
                        )}
           </h2>
 
-          <p className="text-white mt-1 text-sm">
+          <p className="text-[#E5E7EB] mt-1 text-sm">
+            { viewedUser.verificationStatus&& (
+             <span className="  mr-1">Admin •</span>
+            ) }
             {viewedUser.college_year}{" "}
             {viewedUser.department && `• ${viewedUser.department}`}
           </p>
@@ -131,7 +136,7 @@ const Profile = () => {
   <div className="flex space-x-4 mt-4 justify-center md:justify-start">
     <button
       onClick={() => setShowEditProfile(true)}
-      className="flex items-center bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+      className="flex items-center cursor-pointer bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition-colors"
     >
       <Edit size={16} className="mr-2" />
       Edit Profile
@@ -139,7 +144,7 @@ const Profile = () => {
 
     <button
       onClick={() => setShowPostModal(true)}
-      className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      className="flex items-center cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
     >
       <PlusCircle size={16} className="mr-2" />
       Create Post
@@ -155,7 +160,7 @@ const Profile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* ==== Sidebar ==== */}
           <aside className="lg:col-span-3">
-            <div className="bg-gray-800 text-white p-5 rounded-xl shadow-sm space-y-3">
+            <div className="bg-gray-900 text-white p-5 rounded-xl shadow-sm space-y-3">
               <h3 className="font-bold text-lg mb-2 text-center border-b border-gray-700 pb-2">
                 User Stats
               </h3>
@@ -194,7 +199,7 @@ const Profile = () => {
               <div className="flex space-x-2">
                 <button
                   onClick={() => setFilter("all")}
-                  className={`px-3 py-1 rounded-md border text-sm font-semibold ${
+                  className={`px-3 py-1 rounded-md border cursor-pointer text-sm font-semibold ${
                     filter === "all"
                       ? "bg-blue-600 text-white border-blue-600"
                       : "bg-white text-gray-700 border-gray-300"
@@ -204,7 +209,7 @@ const Profile = () => {
                 </button>
                 <button
                   onClick={() => setFilter("FOUND")}
-                  className={`px-3 py-1 rounded-md border text-sm font-semibold ${
+                  className={`px-3 py-1 rounded-md border cursor-pointer text-sm font-semibold ${
                     filter === "FOUND"
                       ? "bg-blue-600 text-white border-blue-600"
                       : "bg-white text-gray-700 border-gray-300"
@@ -214,7 +219,7 @@ const Profile = () => {
                 </button>
                 <button
                   onClick={() => setFilter("LOST")}
-                  className={`px-3 py-1 rounded-md border text-sm font-semibold ${
+                  className={`px-3 py-1 rounded-md border cursor-pointer text-sm font-semibold ${
                     filter === "LOST"
                       ? "bg-blue-600 text-white border-blue-600"
                       : "bg-white text-gray-700 border-gray-300"
@@ -224,7 +229,7 @@ const Profile = () => {
                 </button>
                 <button
                   onClick={() => setFilter("RESOLVED")}
-                  className={`px-3 py-1 rounded-md border hidden sm:block text-sm font-semibold ${
+                  className={`px-3 py-1 rounded-md border cursor-pointer hidden sm:block text-sm font-semibold ${
                     filter === "RESOLVED"
                       ? "bg-blue-600 text-white border-blue-600"
                       : "bg-white text-gray-700 border-gray-300"
@@ -234,7 +239,7 @@ const Profile = () => {
                 </button>
                 <button
                   onClick={() => setFilter("UNRESOLVED")}
-                  className={`px-3 py-1 rounded-md hidden sm:block border text-sm font-semibold ${
+                  className={`px-3 py-1 rounded-md hidden sm:block cursor-pointer border text-sm font-semibold ${
                     filter === "UNRESOLVED"
                       ? "bg-blue-600 text-white border-blue-600"
                       : "bg-white text-gray-700 border-gray-300"

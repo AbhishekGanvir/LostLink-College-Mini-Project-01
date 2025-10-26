@@ -3,6 +3,7 @@ import { getComments, addComment, deleteComment } from "../utils/api";
 import { getCurrentUser } from "../utils/auth";
 import Loader from "./Loader";
 import {  Trash } from "lucide-react";
+import { Trash2 } from "react-feather";
 
 const CommentSection = ({ postId }) => {
   const [comments, setComments] = useState([]);
@@ -125,8 +126,9 @@ const CommentSection = ({ postId }) => {
 
           return (
             <div
+            onClick={() => window.location.href = `/profile/${user._id}`}
               key={c._id}
-              className="flex items-start space-x-3 bg-gray-50 p-3 rounded-lg break-words"
+              className="flex cursor-pointer items-start space-x-3 bg-gray-50 p-3 rounded-lg break-words"
             >
               {c.userProfilePic?.url ? (
                 <img
@@ -157,13 +159,13 @@ const CommentSection = ({ postId }) => {
                   {canDelete && (
                     <button
                       onClick={() => handleDelete(c._id)}
-                      className="text-xs cursor-pointer text-red-500 hover:underline flex items-center"
+                      className=" p-2 rounded-full cursor-pointer text-gray-400 hover:text-red-500 hover:bg-red-100  flex items-center"
                       disabled={deletingId === c._id}
                     >
                       {deletingId === c._id ? (
                         <Loader size={14} />
                       ) : (
-                        <Trash size={20} className="mr-1" />
+                        <Trash size={18}  />
                       )}
                     </button>
                   )}

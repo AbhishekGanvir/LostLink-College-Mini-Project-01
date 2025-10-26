@@ -84,7 +84,7 @@ const EditPostModal = ({ post, closeModal, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="bg-gray-800 text-white p-8 rounded-xl shadow-2xl w-full max-w-lg relative">
+      <div className="bg-gray-900 text-white p-8 rounded-xl shadow-2xl w-full max-w-lg relative">
         <button
           onClick={closeModal}
           className="absolute top-4 right-4 text-gray-400 cursor-pointer hover:text-white"

@@ -60,7 +60,7 @@ export default function AuthModal({ onClose, onLoginSuccess }) {
       onClick={() => onClose && onClose()}
     >
       <div
-        className="bg-gray-800 text-white p-8 rounded-xl shadow-2xl w-full max-w-md relative"
+        className="bg-gray-900 text-white p-8 rounded-xl shadow-2xl w-full max-w-md relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button

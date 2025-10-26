@@ -5,9 +5,11 @@ import RightPanel from "../components/RightPanel";
 import ItemCard from "../components/ItemCard";
 import PostFormModal from "../components/PostFormModal";
 import { getAllPosts } from "../utils/api";
+import { getCurrentUser } from "../utils/auth";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const currentUser = getCurrentUser(); // fetch logged-in user
   const [openModal, setOpenModal] = useState(false);
   const [filter, setFilter] = useState("all");
   const [category, setCategory] = useState("all");
@@ -71,7 +73,7 @@ const Home = () => {
               No items found matching your filters.
             </div>
           ) : (
-            filteredPosts.map((item) => <ItemCard key={item._id} item={item}  />)
+            filteredPosts.map((item) => <ItemCard key={item._id} item={item} currentUser={currentUser}  />)
           )}
         </section>
 

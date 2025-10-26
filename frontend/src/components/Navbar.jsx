@@ -117,7 +117,7 @@ const Navbar = ({ onPostClick, searchQuery, setSearchQuery }) => {
             <div className="relative">
               <button
                 onClick={() => setShowUserDropdown((p) => !p)}
-                className="flex items-center space-x-2"
+                className="flex items-center cursor-pointer space-x-2"
               >
                 {user.profilePic?.url ? (
                   <img

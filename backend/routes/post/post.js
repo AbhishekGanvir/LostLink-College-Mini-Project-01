@@ -66,39 +66,51 @@ router.post("/", verifyToken, (req, res, next) => {
   });
 });
 
-// GET ALL POSTS with verificationStatus
+// GET ALL POSTS
 router.get("/", async (req, res) => {
   try {
     let posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate("userId", "username profilePic verificationStatus")
+      .populate("userId", "username profilePic verificationStatus isAdmin")
       .lean();
 
-    // Add default verificationStatus if missing
-    posts = posts.map(post => ({
+    // Ensure userId is always an object with _id as string
+    posts = posts.map((post) => ({
       ...post,
-      verificationStatus: post.userId?.verificationStatus || false
+      userId: post.userId
+        ? {
+            _id: post.userId._id.toString(),
+            username: post.userId.username,
+            profilePic: post.userId.profilePic,
+            verificationStatus: post.userId.verificationStatus,
+            isAdmin: post.userId.isAdmin, 
+          }
+        : { _id: post.userId?.toString() || null },
     }));
 
-    // No filtering by admin status
     res.status(200).json(posts);
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+;
 
 
 
-//  GET USER POSTS 
-router.get("/user/:userId", verifyToken, async (req, res) => {
+// GET USER POSTS (public)
+router.get("/user/:userId", async (req, res) => {
   try {
-    const posts = await Post.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    const posts = await Post.find({ userId: req.params.userId })
+  .sort({ createdAt: -1 })
+  .populate("userId", "username profilePic verificationStatus")
+  .lean();
+
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // GET SINGLE POST 
 router.get("/:id", async (req, res) => {

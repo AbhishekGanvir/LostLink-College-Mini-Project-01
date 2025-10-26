@@ -35,6 +35,22 @@ router.get("/users", verifyToken, async (req, res) => {
   }
 });
 
+ // --- Get all posts ---
+router.get("/posts", verifyToken, async (req, res) => {
+  try {
+    const admin = await ensureAdmin(req, res);
+    if (!admin) return;
+
+    const posts = await Post.find()
+      .populate("userId", "name studentname profilePic email")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error("Get posts error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
    // Get system stats
    
@@ -97,6 +113,36 @@ router.delete("/users/:id", verifyToken, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+    // Delete a specific post
+router.delete("/posts/:id", verifyToken, async (req, res) => {
+  try {
+    const admin = await ensureAdmin(req, res);
+    if (!admin) return;
+
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    // Delete post images from Cloudinary
+    if (post.images && post.images.length > 0) {
+      for (const image of post.images) {
+        await deleteFromCloudinary(image.publicId);
+      }
+    }
+
+    // Delete all comments associated with this post
+    await Comment.deleteMany({ postId: post._id });
+
+    // Delete the post itself
+    await Post.findByIdAndDelete(post._id);
+
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (err) {
+    console.error("Delete post error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+   
 
 
 // Delete all posts & comments (Admin cleanup) 
