@@ -80,7 +80,7 @@ Admins have additional privileges to manage users, posts, and maintain a safe en
 | **POST** | `/api/auth/logout`   | Logout user/admin                                       |
 
 > 🔹 Admin and user registration use the same endpoint.
-> To make an admin, set `isAdmin = true` and `verifyStatus = "verified"` manually in the database.
+> To make an admin, set `isAdmin = true` manually in the database.
 
 ---
 

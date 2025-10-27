@@ -24,14 +24,7 @@
 
 ---
 
-## 🎨 Highlights
 
-* Gradient headers and interactive UI elements.
-* Custom scrollbars for post lists.
-* Clear distinction between resolved and unresolved posts.
-* Modal-based interactions for posts, profiles, and admin actions.
-
----
 
 ## 🏗 Technology Stack
 

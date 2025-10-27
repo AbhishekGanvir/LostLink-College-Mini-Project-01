@@ -18,9 +18,14 @@ app.use(cors());
 
 app.use(cors({
   origin: ["http://localhost:3000",
-    "https://lostlink-z8pw.onrender.com"
+    "https://lostlink-z8pw.onrender.com",
+    "https://lostlink-z8pw.onrender.com/profile/",
+    "https://lostlink-z8pw.onrender.com/admin"
+
   ],
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 
@@ -64,8 +69,9 @@ if (process.env.NODE_ENV === "production") {
 
 
 
+
 // --- Start Server ---
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
