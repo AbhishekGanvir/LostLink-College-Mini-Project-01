@@ -101,7 +101,7 @@ npm run start
 ```
 http://localhost:5000
 ```
-
+> ⚠️ **Important:** When deploying, make sure to replace `REACT_APP_API_URL` with your **deployed backend URL** — otherwise, the frontend will fail to connect to the backend.
 
 
 ## 🤝 Contributing
