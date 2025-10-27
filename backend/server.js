@@ -18,9 +18,9 @@ app.use(cors());
 
 app.use(cors({
   origin: ["http://localhost:3000",
-    "https://lostlink-z8pw.onrender.com",
-    "https://lostlink-z8pw.onrender.com/profile/",
-    "https://lostlink-z8pw.onrender.com/admin"
+    "https://lostlink.up.railway.app/",
+    "https://lostlink-z8pw.onrender.com/"
+    
 
   ],
   credentials: true,
