@@ -7,7 +7,7 @@ import { fileURLToPath } from "url"; // Needed to fix __dirname in ES modules
 
 // --- Fix __dirname for ES modules ---
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.resolve();
 
 dotenv.config();
 const app = express();
@@ -16,10 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use(cors({
-  origin: ["https://lostlink-oi9s.onrender.com"],
-  credentials: true,
-}));
+
 
 
 // --- API ROUTES ---
@@ -48,22 +45,18 @@ mongoose
 // --- Production frontend (SPA) ---
 if (process.env.NODE_ENV === "production") {
   // Correct path: move from backend/ to root/frontend/dist
-  const distPath = path.join(__dirname, "..", "frontend", "dist");
-
-  // Serve JS/CSS/assets
-  app.use(express.static(distPath));
+ app.use(express.static(path.join(__dirname,"/frontend/dist")))
 
   // SPA fallback for non-API routes
-  app.get(/^\/(?!api\/).*$/, (req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(distPath,"frontend", "dist", "index.html"));
   });
 }
 
-
-
 // --- Start Server ---
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, "0.0.0.0", () => {
+
+app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
 
