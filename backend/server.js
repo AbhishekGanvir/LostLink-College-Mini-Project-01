@@ -5,9 +5,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url"; // Needed to fix __dirname in ES modules
 
-// --- Fix __dirname for ES modules ---
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.resolve();
+
 
 dotenv.config();
 const app = express();
@@ -42,16 +40,7 @@ mongoose
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// --- Production frontend (SPA) ---
-if (process.env.NODE_ENV === "production") {
-  // Correct path: move from backend/ to root/frontend/dist
- app.use(express.static(path.join(__dirname,"/frontend/dist")))
 
-  // SPA fallback for non-API routes
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(distPath,"frontend", "dist", "index.html"));
-  });
-}
 
 // --- Start Server ---
 const PORT = process.env.PORT || 4000;
